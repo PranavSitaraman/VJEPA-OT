@@ -1,0 +1,40 @@
+<sdf xmlns:ns0="drake.mit.edu" version="1.7" ns0:xmlns:drake="drake.mit.edu">
+  <model name="A">
+    <link name="A_body_link">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <pose>0.07027 0.06805 0.04000 0 0 0</pose>
+        <inertia>
+          <ixx>2.14762e-05</ixx>
+          <ixy>-4.09349e-08</ixy>
+          <ixz>7.73134e-21</ixz>
+          <iyy>1.65852e-05</iyy>
+          <iyz>-0.00000e+00</iyz>
+          <izz>2.73947e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>A.obj</uri>
+            <scale>1.0 1.0 1.0</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_bbox">
+        <pose>0.07032 0.07500 0.04000 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.13743 0.15000 0.08000</size>
+          </box>
+        </geometry>
+        <ns0:proximity_properties>
+          <ns0:rigid_hydroelastic />
+          <ns0:mu_dynamic>1.000</ns0:mu_dynamic>
+          <ns0:mu_static>1.000</ns0:mu_static>
+        </ns0:proximity_properties>
+      </collision>
+    </link>
+  </model>
+</sdf>

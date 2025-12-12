@@ -1,0 +1,78 @@
+device: cuda
+seed: 42
+
+data:
+  episode_dir: ./episodes
+  image_size: [256, 256]  # Meta VJEPA2-AC: 256x256 resolution
+  fps: 4  # Meta VJEPA2-AC: 4 fps
+  window_k: 2  # Meta VJEPA2-AC: 2 previous frames context
+  horizon_H: 4  # Meta VJEPA2-AC: 4 future actions
+  batch_size: 8  # Per-GPU batch size (8 GPUs × 4 batch × 8 accum = 256 effective)
+  use_embeddings: false
+  num_workers: 4
+  # Data augmentation matching Meta VJEPA2-AC paper
+  augment: true  # Enable V-JEPA 2 style RandomResizedCrop
+  random_resize_aspect_ratio: [0.75, 1.35]
+  random_resize_scale: [0.3, 1.0]
+  horizontal_flip: false  # Disabled for robotics (preserves left-right semantics)
+  # Camera view selection (Meta VJEPA2 trains on single camera view)
+  front_camera_only: true  # Use only front camera (left exocentric view matching Meta's DROID training)
+
+model:
+  architecture: vjepa2ac-continued
+  latent_dim: 256
+  metric_rank: 16
+  ema_decay: 0.99925  # Meta VJEPA2: EMA 0.99925
+  state_dim: 7  # End-effector pose: [pos(3), rot(3), gripper(1)]
+  act_dim: 7    # End-effector delta: [pos_delta(3), rot_delta(3), gripper_delta(1)]
+  patch_size: 16  # Meta VJEPA2: 16x16 patches
+  # Meta VJEPA2-AC predictor architecture (action-conditioned, from droid config)
+  pred_depth: 24  # Meta VJEPA2-AC: 24 transformer layers
+  pred_embed_dim: 1024  # Meta VJEPA2-AC: 1024 hidden dim
+  pred_num_heads: 16  # Meta VJEPA2-AC: 16 attention heads
+  vision_backbone: vjepa2_hub
+  use_rope: true  # Meta VJEPA2: RoPE positional embeddings
+  uniform_power: true  # Meta VJEPA2: uniform power for attention
+
+loss_weights:
+  jepa: 1.0  # Full JEPA loss for predictor training
+  ot_time: 0.0
+  ot_xmod: 0.0
+  string: 0.0
+  goal: 0.0
+  batch_ot: 0.0
+  bilevel_ot: 0.0
+  gw_align: 0.0
+  fm: 1.0  # Balanced FM training with JEPA
+  metric: 0.0
+  rollout: 0.1  # Rollout consistency for better temporal prediction
+
+vjepa2:
+  variant: vjepa2_ac_vit_giant
+  pretrained: true
+  freeze_encoder: true  # Continued: encoder frozen, predictor trained
+  freeze_predictor: false  # Continued: train predictor
+
+ot:
+  method: sliced
+  use_gw_alignment: false
+
+train:
+  total_steps: 10000  # Fair comparison across all variants
+  # Meta VJEPA2-AC learning rate schedule (scaled for 200 steps vs 94500 steps)
+  lr: 4.25e-4  # Meta VJEPA2-AC: constant LR 4.25e-4
+  start_lr: 7.5e-5  # Meta VJEPA2-AC: warmup from 7.5e-5
+  weight_decay: 0.04  # Meta VJEPA2-AC: 0.04 weight decay
+  save_every: 2000
+  fm_teacher_stride: 1
+  fm_supervision: dataset
+  fast_mode: true
+  compile: true
+  compile_mode: reduce-overhead
+  grad_accum_steps: 8  # Accumulate to effective batch size 256 (4 × 8 GPUs × 8 = 256)
+  max_grad_norm: 1.0  # Standard gradient clipping for stability
+  use_amp: true
+  amp_dtype: bfloat16  # Meta VJEPA2: bfloat16 training
+  jepa_loss: l1  # L1 loss for JEPA (more robust)
+  rollout_steps: 2  # Multi-step rollout for full variant
+  lr_warmup_steps: 500  # ~5% warmup (Meta uses 4500/94500 ≈ 4.8%)

@@ -1,0 +1,111 @@
+directives:
+# Franka Panda arm
+- add_model:
+    name: panda
+    file: package://drake_models/franka_description/urdf/panda_arm.urdf
+    default_joint_positions:
+        panda_joint1: [0]
+        panda_joint2: [0.1]
+        panda_joint3: [0]
+        panda_joint4: [-1.2]
+        panda_joint5: [0]
+        panda_joint6: [1.6]
+        panda_joint7: [0]
+- add_weld:
+    parent: world
+    child: panda::panda_link0
+
+# Schunk WSG gripper (Drake-supported driver)
+- add_model:
+    name: wsg
+    file: package://drake_models/wsg_50_description/sdf/schunk_wsg_50_with_tip.sdf
+- add_weld:
+    parent: panda::panda_link8
+    child: wsg::body
+    X_PC:
+        # WSG mounts to panda_link8 with offset and rotation
+        translation: [0, 0, 0.1034]
+        rotation: !Rpy { deg: [90, 0, 90] }
+
+# Table (same as reference)
+- add_model:
+    name: table
+    file: package://manipulation/table.sdf
+- add_weld:
+    parent: world
+    child: table::table_link
+    X_PC:
+        translation: [0.0, 0.0, -0.05]
+        rotation: !Rpy { deg: [0, 0, -90] }
+
+# Stand (same as reference)
+- add_model:
+    name: stand
+    file: package://manipulation/stand.sdf
+- add_weld:
+    parent: world
+    child: stand::stand_body
+    X_PC:
+        translation: [0.5, 0.0, 0.0]
+        rotation: !Rpy { deg: [0, 0, 0] }
+
+# Shelves (same as reference)
+- add_model:
+    name: shelves
+    file: package://manipulation/shelves.sdf
+- add_weld:
+    parent: world
+    child: shelves::shelves_body
+    X_PC:
+        translation: [0.9, 0, 0.3995]
+        rotation: !Rpy { deg: [0, 0, 180]}
+
+# Letter object WELDED TO GRIPPER (for grasp->place planning)
+# This is the key difference from the base scenario
+- add_model:
+    name: letter
+    file: LETTER_FILE_PLACEHOLDER
+- add_weld:
+    parent: wsg::body
+    child: letter::LETTER_BODY_NAME
+    X_PC:
+        translation: LETTER_WELD_TRANSLATION
+        rotation: !Rpy { deg: LETTER_WELD_ROTATION }
+
+# Shelf objects - Cheez-it box (same as reference)
+- add_model:
+    name: cheez_it
+    file: package://manipulation/hydro/003_cracker_box.sdf
+- add_weld:
+    parent: shelves::shelves_body
+    child: cheez_it::base_link_cracker
+    X_PC:
+        translation: [0.05, -0.18, 0.245]
+        rotation: !Rpy { deg: [-90, 0, 0] }
+
+# Additional grocery items (same as reference)
+- add_model:
+    name: sugar_box
+    file: package://manipulation/hydro/004_sugar_box.sdf
+- add_weld:
+    parent: shelves::shelves_body
+    child: sugar_box::base_link_sugar
+    X_PC:
+        translation: [0.1, 0.15, -0.035]
+        rotation: !Rpy { deg: [-90, 0, -90] }
+
+- add_model:
+    name: soup_can
+    file: package://manipulation/hydro/005_tomato_soup_can.sdf
+- add_weld:
+    parent: shelves::shelves_body
+    child: soup_can::base_link_soup
+    X_PC:
+        translation: [0.1, -0.17, -0.072]
+        rotation: !Rpy { deg: [-90, 0, -90] }
+
+model_drivers:
+    panda: !IiwaDriver
+      control_mode: position_only
+      hand_model_name: wsg
+    wsg: !SchunkWsgDriver {}

@@ -1,0 +1,90 @@
+
+directives:
+
+- add_model:
+    name: panda
+    file: package://drake_models/franka_description/urdf/panda_arm.urdf
+- add_weld:
+    parent: world
+    child: panda::panda_link0
+
+- add_model:
+    name: hand
+    file: package://drake_models/franka_description/urdf/hand.urdf  
+- add_weld:
+    parent: panda::panda_link8
+    child: hand::panda_hand
+
+
+# Table
+- add_model:
+    name: table
+    file: package://drake_models/manipulation_station/table_wide.sdf
+- add_weld:
+    parent: world
+    child: table::table_body
+    X_PC:
+        translation: [0.0, 0.0, -0.05]
+
+# Stand on table
+- add_model:
+    name: stand
+    file: package://drake_models/manipulation_station/cylinder.sdf
+- add_weld:
+    parent: world
+    child: stand::base_link
+    X_PC:
+        translation: [0.5, 0.0, 0.0]
+
+# Shelf unit
+- add_model:
+    name: shelves
+    file: package://drake_models/manipulation_station/shelves.sdf
+- add_weld:
+    parent: world
+    child: shelves::shelves_body
+    X_PC:
+        translation: [0.9, 0, 0.3995]
+        rotation: !Rpy { deg: [0, 0, 180]}
+
+# Letter object (free-floating to be manipulated)
+- add_model:
+    name: letter
+    file: file:///n/holylabs/ydu_lab/Lab/pranavsitaraman/JEPA-OT/assets/P_model/P.sdf
+
+# Mustard bottle obstacle on table
+- add_model:
+    name: mustard
+    file: package://drake_models/ycb/006_mustard_bottle.sdf
+
+# Shelf objects - Cheez-it box
+- add_model:
+    name: cheez_it
+    file: package://drake_models/ycb/003_cracker_box.sdf
+- add_weld:
+    parent: shelves::shelves_body
+    child: cheez_it::base_link_cracker
+    X_PC:
+        translation: [0.15, 0.0, 0.26]
+        rotation: !Rpy { deg: [0, 0, 90]}
+
+# Soup can
+- add_model:
+    name: soup_can
+    file: package://drake_models/ycb/005_tomato_soup_can.sdf
+- add_weld:
+    parent: shelves::shelves_body
+    child: soup_can::base_link_soup
+    X_PC:
+        translation: [-0.05, 0.12, 0.10]
+
+# Additional grocery items
+- add_model:
+    name: sugar_box
+    file: package://drake_models/ycb/004_sugar_box.sdf
+- add_weld:
+    parent: shelves::shelves_body  
+    child: sugar_box::base_link_sugar
+    X_PC:
+        translation: [-0.15, -0.10, 0.10]
+        rotation: !Rpy { deg: [0, 0, 45]}

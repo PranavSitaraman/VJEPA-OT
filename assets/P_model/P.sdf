@@ -1,0 +1,43 @@
+<sdf xmlns:ns0="drake.mit.edu" version="1.7" ns0:xmlns:drake="drake.mit.edu">
+  <model name="P">
+    <link name="P_body_link">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <pose>0.04615 0.07248 0.02500 0 0 0</pose>
+        <inertia>
+          <ixx>1.22361e-04</ixx>
+          <ixy>-2.54087e-05</ixy>
+          <ixz>2.62086e-20</ixz>
+          <iyy>8.17168e-05</iyy>
+          <iyz>5.24173e-20</iyz>
+          <izz>1.62411e-04</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>P.obj</uri>
+            <scale>1.0 1.0 1.0</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_bbox">
+        <pose>0.05489 0.06000 0.02500 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.07749 0.12000 0.05000</size>
+          </box>
+        </geometry>
+        <ns0:proximity_properties>
+          <ns0:compliant_hydroelastic />
+          <ns0:hydroelastic_modulus>1.0e6</ns0:hydroelastic_modulus>
+          <ns0:mesh_resolution_hint>0.005</ns0:mesh_resolution_hint>
+          <ns0:mu_dynamic>1.000</ns0:mu_dynamic>
+          <ns0:mu_static>1.000</ns0:mu_static>
+          <ns0:hunt_crossley_dissipation>10.0</ns0:hunt_crossley_dissipation>
+        </ns0:proximity_properties>
+      </collision>
+    </link>
+  </model>
+</sdf>

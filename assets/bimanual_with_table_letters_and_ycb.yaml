@@ -1,0 +1,70 @@
+directives:
+# Left IIWA14 (welded at origin)
+- add_model:
+    name: iiwa_left
+    file: package://drake_models/iiwa_description/urdf/iiwa14_primitive_collision.urdf
+    default_joint_positions:
+      iiwa_joint_1: [-1.57]
+      iiwa_joint_2: [0.10]
+      iiwa_joint_3: [0.0]
+      iiwa_joint_4: [-1.2]
+      iiwa_joint_5: [0.0]
+      iiwa_joint_6: [1.6]
+      iiwa_joint_7: [0.0]
+- add_weld:
+    parent: world
+    child: iiwa_left::iiwa_link_0
+    X_PC:
+      translation: [0.6, 0.3, 0.0]
+
+# Right IIWA14 (shifted +x)
+- add_model:
+    name: iiwa_right
+    file: package://drake_models/iiwa_description/urdf/iiwa14_primitive_collision.urdf
+    default_joint_positions:
+      iiwa_joint_1: [-1.57]
+      iiwa_joint_2: [0.10]
+      iiwa_joint_3: [0.0]
+      iiwa_joint_4: [-1.2]
+      iiwa_joint_5: [0.0]
+      iiwa_joint_6: [1.6]
+      iiwa_joint_7: [0.0]
+- add_weld:
+    parent: world
+    child: iiwa_right::iiwa_link_0
+    X_PC:
+      translation: [0.6, -0.3, 0.0]
+
+# Local table (non-static; welded with offset so top is at z=0)
+- add_model:
+    name: table
+    file: "file:///datasets/_deepnote_work/assets/table.sdf"
+- add_weld:
+    parent: world
+    child: table::top
+    X_PC:
+      translation: [0.5, 0.0, -0.05]
+
+# Your initials (free-floating; default poses)
+
+- add_model:
+    name: letter_P
+    file: "file:///datasets/_deepnote_work/assets/P_model/P.sdf"
+    default_free_body_pose:
+      P_body_link:
+        translation: [0.45, 0.0, 0.6]
+        rotation: !Rpy { deg: [0, 0, 0] }
+
+- add_model:
+    name: letter_S
+    file: "file:///datasets/_deepnote_work/assets/S_model/S.sdf"
+    default_free_body_pose:
+      S_body_link:
+        translation: [0.53, 0.0, 0.62]
+        rotation: !Rpy { deg: [0, 0, 0] }
+
+# One free-floating YCB object from Drake’s resources
+- add_model:
+    name: ycb_box
+    file: package://drake_models/ycb/005_tomato_soup_can.sdf
+
